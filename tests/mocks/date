@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Test mock: return a fixed epoch for `date -u +%s`, delegate everything else.
+if [ "$1" = "-u" ] && [ "$2" = "+%s" ]; then
+  echo "1782043845"
+else
+  exec /bin/date "$@"
+fi
