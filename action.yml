@@ -1,5 +1,5 @@
 name: "Git Cut Tag"
-description: "Language-agnostic semantic-version tagging driven by the latest git tag and a version-line file, with optional dev (timestamped pre-release) tags"
+description: "Language-agnostic semantic-version tagging driven by the latest git tag and a version-line file, with optional timestamped pre-release tags"
 author: "Ybor / P6M <engineering@ybor.ai>"
 
 # Define the inputs for this action
@@ -16,8 +16,8 @@ inputs:
     description: "Override the tag prefix (e.g. 'v'). When empty, the prefix is inferred from the version file's leading non-digit characters."
     required: false
     default: ""
-  dev:
-    description: "Build a development pre-release tag with a trailing epoch timestamp (e.g. 'v1.2.5-1782043845')."
+  pre-release:
+    description: "Build a pre-release tag with a trailing epoch timestamp (e.g. 'v1.2.5-1782043845')."
     required: false
     default: "false"
   working-directory:
@@ -38,11 +38,11 @@ outputs:
     description: "The created git tag, with prefix (e.g. 'v1.2.5')"
     value: ${{ steps.cut.outputs.tag }}
   base-version:
-    description: "The release version without any dev suffix (e.g. '1.2.5')"
+    description: "The release version without any pre-release suffix (e.g. '1.2.5')"
     value: ${{ steps.cut.outputs.base-version }}
-  is-dev:
-    description: "'true' when a development (pre-release) tag was created"
-    value: ${{ steps.cut.outputs.is-dev }}
+  is-pre-release:
+    description: "'true' when a pre-release tag was created"
+    value: ${{ steps.cut.outputs.is-pre-release }}
 
 # Define the runs configuration
 runs:
@@ -59,7 +59,7 @@ runs:
         INPUT_VERSION_FILE: ${{ inputs.version-file }}
         INPUT_VERSION_LEVEL: ${{ inputs.version-level }}
         INPUT_PREFIX: ${{ inputs.prefix }}
-        INPUT_DEV: ${{ inputs.dev }}
+        INPUT_PRE_RELEASE: ${{ inputs.pre-release }}
         INPUT_SKIP_PUSH: ${{ inputs.skip-push }}
       run: |
         bash "${GITHUB_ACTION_PATH}/scripts/cut-tag.sh"
