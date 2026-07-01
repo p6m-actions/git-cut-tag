@@ -103,7 +103,7 @@ prerelease_out() { output_value "$GITHUB_OUTPUT" is-pre-release; }
 # Pre-release builds
 # ---------------------------------------------------------------------------
 
-@test "pre-release build appends -<epoch> and does not include 'dev'" {
+@test "pre-release build appends an -<epoch> timestamp suffix" {
   export INPUT_PRE_RELEASE="true"
   run_cut "v1.2" v1.2.4
   [ "$(prerelease_out)" = "true" ]
