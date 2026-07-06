@@ -6,7 +6,7 @@
 #   INPUT_VERSION_FILE   Path to the version-line file. Holds '<prefix><major>.<minor>' (e.g. 'v1.2').
 #   INPUT_VERSION_LEVEL  patch | minor | major (default patch).
 #   INPUT_PREFIX         Override the tag prefix. Empty = infer from the version file.
-#   INPUT_DEV            'true' to build a pre-release tag '<version>-<epoch>'.
+#   INPUT_PRE_RELEASE    'true' to build a pre-release tag '<version>-<epoch>'.
 #   INPUT_SKIP_PUSH      'true' to skip pushing the tag (useful for testing).
 #
 # The version file is treated as read-only: the maintainer owns it. This action
@@ -16,7 +16,7 @@ set -euo pipefail
 VERSION_FILE="${INPUT_VERSION_FILE:-.version}"
 LEVEL="${INPUT_VERSION_LEVEL:-patch}"
 PREFIX_OVERRIDE="${INPUT_PREFIX:-}"
-DEV="${INPUT_DEV:-false}"
+PRE_RELEASE="${INPUT_PRE_RELEASE:-false}"
 SKIP_PUSH="${INPUT_SKIP_PUSH:-false}"
 
 # ---- Read and parse the version-line file ----------------------------------
@@ -91,14 +91,14 @@ fi
 
 BASE_VERSION="${NMAJ}.${NMIN}.${NPATCH}"
 
-# ---- Apply dev suffix if requested -----------------------------------------
-if [ "$DEV" = "true" ]; then
+# ---- Apply pre-release suffix if requested ---------------------------------
+if [ "$PRE_RELEASE" = "true" ]; then
   TS="$(date -u +%s)"
   VERSION="${BASE_VERSION}-${TS}"
-  IS_DEV="true"
+  IS_PRE_RELEASE="true"
 else
   VERSION="$BASE_VERSION"
-  IS_DEV="false"
+  IS_PRE_RELEASE="false"
 fi
 
 TAG="${PREFIX}${VERSION}"
@@ -115,7 +115,7 @@ if [ -n "${GITHUB_OUTPUT:-}" ]; then
     echo "version=$VERSION"
     echo "base-version=$BASE_VERSION"
     echo "tag=$TAG"
-    echo "is-dev=$IS_DEV"
+    echo "is-pre-release=$IS_PRE_RELEASE"
   } >> "$GITHUB_OUTPUT"
 fi
 

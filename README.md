@@ -15,8 +15,8 @@ The next version is computed by bumping the latest release tag by `version-level
 result up to the version-line floor: if you bump the file's line ahead of every existing tag, the next
 release starts a fresh `.0` on that line.
 
-It also supports **development tags** via the `dev` flag: a valid semver pre-release with a trailing
-epoch timestamp (e.g. `v1.2.5-1782043845`). Dev builds create a tag only.
+It also supports **pre-release tags** via the `pre-release` flag: a valid semver pre-release with a
+trailing epoch timestamp (e.g. `v1.2.5-1782043845`). Pre-release builds create a tag only.
 
 > **The version file is owned by the maintainer.** This action treats it as read-only — it never
 > writes to the file and never creates a commit. To move the major/minor line, edit `.version`
@@ -70,9 +70,9 @@ v1.2
 3. Bump it by `version-level` (`patch` → +1 patch, `minor` → +1 minor & patch 0, `major` → +1 major
    & minor/patch 0). With no existing tag, the base is `0.0.0`.
 4. If the file's `major.minor` is greater than the bumped result, use the file's line with patch `0`.
-5. If `dev` is `true`, append `-<epoch-seconds>`.
+5. If `pre-release` is `true`, append `-<epoch-seconds>`.
 
-| Version file | Latest tag | `version-level` | `dev` | Result tag |
+| Version file | Latest tag | `version-level` | `pre-release` | Result tag |
 |---|---|---|---|---|
 | `v1.2` | `v1.2.4` | `patch` | `false` | `v1.2.5` |
 | `v1.2` | `v1.2.4` | `minor` | `false` | `v1.3.0` |
@@ -88,7 +88,7 @@ v1.2
 | `version-file` | Path to the version-line file (`<prefix><major>.<minor>`) | No | `.version` |
 | `version-level` | Level to bump relative to the latest tag: `patch`, `minor`, `major` | No | `patch` |
 | `prefix` | Override the tag prefix (e.g. `v`). Empty = infer from the version file | No | `""` |
-| `dev` | Build a dev pre-release tag with a trailing epoch timestamp | No | `false` |
+| `pre-release` | Build a pre-release tag with a trailing epoch timestamp | No | `false` |
 | `working-directory` | Directory to operate in (contains the version file, inside the repo) | No | `.` |
 | `skip-push` | Skip pushing the tag (useful for testing) | No | `false` |
 
@@ -98,8 +98,8 @@ v1.2
 |---|---|
 | `version` | New version without prefix (e.g. `1.2.5` or `1.2.5-1782043845`) |
 | `tag` | Created git tag with prefix (e.g. `v1.2.5`) |
-| `base-version` | Release version without any dev suffix (e.g. `1.2.5`) |
-| `is-dev` | `true` when a development tag was created |
+| `base-version` | Release version without any pre-release suffix (e.g. `1.2.5`) |
+| `is-pre-release` | `true` when a pre-release tag was created |
 
 ## Examples
 
@@ -114,14 +114,14 @@ v1.2
     version-level: patch
 ```
 
-### Development build
+### Pre-release build
 
 ```yaml
 - uses: p6m-actions/git-cut-tag@v1
   id: tag
   with:
-    dev: "true"
-- run: echo "Built dev tag ${{ steps.tag.outputs.tag }}"
+    pre-release: "true"
+- run: echo "Built pre-release tag ${{ steps.tag.outputs.tag }}"
 ```
 
 ### Custom version file and prefix

@@ -12,7 +12,7 @@ setup() {
   export INPUT_SKIP_PUSH="true"
   export INPUT_VERSION_LEVEL="patch"
   export INPUT_PREFIX=""
-  export INPUT_DEV="false"
+  export INPUT_PRE_RELEASE="false"
   export INPUT_VERSION_FILE=".version"
 }
 
@@ -33,7 +33,7 @@ run_cut() {
 tag_out()  { output_value "$GITHUB_OUTPUT" tag; }
 ver_out()  { output_value "$GITHUB_OUTPUT" version; }
 base_out() { output_value "$GITHUB_OUTPUT" base-version; }
-dev_out()  { output_value "$GITHUB_OUTPUT" is-dev; }
+prerelease_out() { output_value "$GITHUB_OUTPUT" is-pre-release; }
 
 # ---------------------------------------------------------------------------
 # Core version computation
@@ -42,7 +42,7 @@ dev_out()  { output_value "$GITHUB_OUTPUT" is-dev; }
 @test "patch bump on current line" {
   run_cut "v1.2" v1.0.0 v1.2.3 v1.2.4
   [ "$(tag_out)" = "v1.2.5" ]
-  [ "$(dev_out)" = "false" ]
+  [ "$(prerelease_out)" = "false" ]
 }
 
 @test "minor bump advances the minor and zeroes the patch" {
@@ -100,20 +100,20 @@ dev_out()  { output_value "$GITHUB_OUTPUT" is-dev; }
 }
 
 # ---------------------------------------------------------------------------
-# Dev builds
+# Pre-release builds
 # ---------------------------------------------------------------------------
 
-@test "dev build appends -<epoch> and does not include 'dev'" {
-  export INPUT_DEV="true"
+@test "pre-release build appends an -<epoch> timestamp suffix" {
+  export INPUT_PRE_RELEASE="true"
   run_cut "v1.2" v1.2.4
-  [ "$(dev_out)" = "true" ]
+  [ "$(prerelease_out)" = "true" ]
   [ "$(base_out)" = "1.2.5" ]
   [[ "$(ver_out)" =~ ^1\.2\.5-[0-9]+$ ]]
   [[ "$(tag_out)" =~ ^v1\.2\.5-[0-9]+$ ]]
 }
 
-@test "dev build creates the tag locally" {
-  export INPUT_DEV="true"
+@test "pre-release build creates the tag locally" {
+  export INPUT_PRE_RELEASE="true"
   run_cut "v1.2" v1.2.4
   local tag
   tag="$(tag_out)"
@@ -156,10 +156,10 @@ dev_out()  { output_value "$GITHUB_OUTPUT" is-dev; }
   [[ "$output" == *"version-level must be"* ]]
 }
 
-@test "existing target tag fails clearly (dev re-run, fixed epoch)" {
-  # With a mocked fixed epoch, a second dev build computes the same tag.
+@test "existing target tag fails clearly (pre-release re-run, fixed epoch)" {
+  # With a mocked fixed epoch, a second pre-release build computes the same tag.
   export PATH="${BATS_TEST_DIRNAME}/mocks:${PATH}"
-  export INPUT_DEV="true"
+  export INPUT_PRE_RELEASE="true"
   make_repo "$WORK" v1.2.4
   write_version_file "$WORK" "v1.2"
   ( cd "$WORK" && bash "$SCRIPT" )   # creates v1.2.5-1782043845
